@@ -81,9 +81,11 @@ class EditUserView(APIView):
         
         
 class ChangePasswordView(APIView):
-    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        user = request.user
         current_password = request.data.get('current_password')
         new_password = request.data.get('new_password')
         confirm_password = request.data.get('confirm_password')
@@ -91,14 +93,11 @@ class ChangePasswordView(APIView):
         if new_password != confirm_password:
             return Response({"error": "Die neuen Passwörter stimmen nicht überein."}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = request.user
         if not user.check_password(current_password):
             return Response({"error": "Das aktuelle Passwort ist falsch."}, status=status.HTTP_400_BAD_REQUEST)
 
         user.set_password(new_password)
         user.save()
-        update_session_auth_hash(request, user) 
-
         return Response({"message": "Passwort erfolgreich geändert."})
     
 
