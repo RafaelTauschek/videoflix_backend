@@ -23,7 +23,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),
-    path('videos/', VideoView.as_view()),
-    path('videos/<int:pk>/', VideoView.as_view()),
+    path('videos/', VideoView.as_view(), name='video-list'),
+    path('videos/<int:pk>/', VideoView.as_view(), name='video-detail'),
     path('users/', include('user.urls')),
+    path('__debug__/', include('debug_toolbar.urls'))
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

@@ -42,10 +42,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_rq',
     'video.apps.VideoConfig',
+    'import_export',
     'user',
+    'debug_toolbar'
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -129,7 +132,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/staticfiles')
+IMPORT_EXPORT_USE_TRANSACTIONS = True
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -158,7 +162,7 @@ CACHE_TTL = 60 * 15
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": 'redit://127.0.0.1:6379/1',
+        "LOCATION": 'redis://127.0.0.1:6379/1',
         "OPTIONS": {
             "PASSWORD": 'foobared',
             "CLIENT_CLASS": "django_redis.client.DefaultClient"

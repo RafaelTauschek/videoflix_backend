@@ -14,9 +14,9 @@ class Video(models.Model):
     video_file = models.FileField(null=True, blank=True, upload_to='videos')
     fsk = models.IntegerField(choices=FSK_CHOICES, default=0)
     created_at =  models.DateField(default=datetime.date.today)
-    img = models.FileField(null=True, blank=True)
+    thumbnail = models.FileField(null=True, blank=True, upload_to='thumbnails')
     genre = models.CharField(max_length=100, blank=True)
-    duration_time = models.IntegerField()
+    duration_time = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.title
