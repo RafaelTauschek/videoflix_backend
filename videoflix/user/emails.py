@@ -14,3 +14,16 @@ def send_confirmation_email(user, request):
     subject = 'Bitte bestätigen Sie Ihre E-Mail-Adresse'
     message = f'Ihr Bestätigungslink: {confirmation_link}'
     send_mail(subject, message, 'from@example.com', [user.email])
+    
+    
+    
+def send_password_reset_email(user, request):
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    password_reset_link = request.build_absolute_uri(
+        reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+    )
+
+    subject = 'Passwort zurücksetzen'
+    message = f'Bitte verwenden Sie den folgenden Link, um Ihr Passwort zurückzusetzen: {password_reset_link}'
+    send_mail(subject, message, 'from@example.com', [user.email])

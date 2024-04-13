@@ -10,8 +10,9 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth import get_user_model
-from .emails import send_confirmation_email 
+from .emails import send_confirmation_email, send_password_reset_email
 from django.contrib.auth import authenticate
+from django.contrib.auth import update_session_auth_hash
 
 
 class ConfirmEmailView(APIView):
@@ -67,6 +68,54 @@ class EditUserView(APIView):
             return Response({"message": "Benutzerdaten aktualisiert."})
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+    def patch(self, request, *args, **kwargs):
+        user = request.user
+        serializer = CustomUserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Benutzerdaten aktualisiert."})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated] 
+
+    def post(self, request, *args, **kwargs):
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+
+        if new_password != confirm_password:
+            return Response({"error": "Die neuen Passwörter stimmen nicht überein."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        if not user.check_password(current_password):
+            return Response({"error": "Das aktuelle Passwort ist falsch."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        update_session_auth_hash(request, user) 
+
+        return Response({"message": "Passwort erfolgreich geändert."})
+    
+
+class PasswordResetRequestView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if email:
+            user = get_user_model().objects.filter(email=email).first()
+            if user:
+                send_password_reset_email(user, request)
+                return Response({"message": "Eine E-Mail zum Zurücksetzen des Passworts wurde gesendet."}, status=200)
+            else:
+                return Response({"error": "Kein Benutzer mit dieser E-Mail gefunden."}, status=404)
+        else:
+            return Response({"error": "E-Mail-Adresse ist erforderlich."}, status=400)
     
     
 class LogoutView(APIView):
