@@ -13,11 +13,10 @@ from .models import Video
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
-
 class VideoView(APIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
-    
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, pk=None, format=None):
         if pk:
             video = get_object_or_404(Video, pk=pk)
@@ -28,6 +27,7 @@ class VideoView(APIView):
             serializer = VideoSerializer(videos, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
     
+    @cache_page(CACHE_TTL)
     def post(self, request, format=None):
         serializer = VideoSerializer(data=request.data, context={'request': request})
         if serializer.is_valid(raise_exception=True):
@@ -35,7 +35,8 @@ class VideoView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        
+    @cache_page(CACHE_TTL)
     def patch(self, request, pk=None, format=None):
         instance = get_object_or_404(Video, pk=pk)
         serializer = VideoSerializer(instance, data=request.data, context={'request': request})
@@ -44,7 +45,7 @@ class VideoView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    
+    @cache_page(CACHE_TTL)
     def put(self, request, pk=None, format=None):
         instance = get_object_or_404(Video, pk=pk)
         serializer = VideoSerializer(instance, data=request.data, context={'request': request})

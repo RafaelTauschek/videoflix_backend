@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,8 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'video',
-    'user'
+    'django_rq',
+    'video.apps.VideoConfig',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +53,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
 ]
 
 ROOT_URLCONF = 'videoflix.urls'
@@ -74,6 +80,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'videoflix.wsgi.application'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -138,9 +146,9 @@ REST_FRAMEWORK = {
 RQ_QUEUES = {
     'default': {
         'HOST': 'localhost',
+        'PASSWORD': 'foobared',
         'PORT': 6379,
         'DB': 0,
-        'PASSWORD': 'foobared',
         'DEFAULT_TIMEOUT': 360,
     }
 }
@@ -152,11 +160,14 @@ CACHES = {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": 'redit://127.0.0.1:6379/1',
         "OPTIONS": {
+            "PASSWORD": 'foobared',
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
         "KEY_PREFIX": "videoflix"
     }
 }
+
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'

@@ -1,9 +1,9 @@
 import os
 from django.dispatch import receiver
 import django_rq
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_save
 from django_rq import enqueue
-from videoflix.video.models import Video
+from .models import Video
 from video.tasks import convert_360p, convert_720p, convert_1080p
 
 @receiver(post_save, sender=Video)
@@ -21,3 +21,11 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     if instance.video_file:
         if os.path.isfile(instance.video_file.path):
             os.remove(instance.video_file.path)
+    
+
+@receiver(pre_save, sender=Video)
+def get_video_duration(sender, instance, **kwargs):
+    pass
+
+
+
