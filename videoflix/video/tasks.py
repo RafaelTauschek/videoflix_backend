@@ -29,18 +29,17 @@ def convert_1080p(source):
         print(f"Error converting video to 1080p: {e}")
 
 
-def generate_thumbnail(source, title):
+def generate_thumbnail(source):
     try:
-        thumbnail_dir = os.path.join("media", "thumbnails")
-        os.makedirs(thumbnail_dir, exist_ok=True)
-        target = os.path.join(thumbnail_dir, f"{title}_thumbnail.png")
-        cmd = 'ffmpeg -ss 00:00:15 -i {} -frames:v 1 {}'.format(source, target)
-        subprocess.run(cmd, shell=True, check=True)
+        video_filename = os.path.basename(os.path.normpath(source))
+        parent_dir = os.path.dirname(os.path.dirname(source))
+        thumbnail_dir = os.path.join(parent_dir, "thumbnails")
+        target = os.path.join(thumbnail_dir, video_filename.replace('.mp4', '_thumbnail.png'))
+        cmd = 'ffmpeg -y -i "{}" -filter_complex "[0]crop=iw:ih[grab]" -map [grab] -frames:v 1 -update true "{}"'.format(source, target)
+        subprocess.run(cmd, capture_output=True, check=True, shell=True)
         return target
     except subprocess.CalledProcessError as e:
         print(f"Error generating thumbnail: {e}")
-        return None
-
 
 def capture_duration(source):
     try:

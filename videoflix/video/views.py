@@ -1,3 +1,4 @@
+import os
 from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -9,6 +10,7 @@ from rest_framework import status
 from .serializers import VideoSerializer
 from .models import Video
 
+VIDEO_FOLDER = './media/videos'
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
@@ -17,10 +19,15 @@ class VideoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk=None, format=None):
+        print(request)
         if pk:
             video = get_object_or_404(Video, pk=pk)
-            serializer = VideoSerializer(video)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            resolutions = get_video_resolutions(video)
+            data = {
+                'video': VideoSerializer(video).data,
+                'resolutions': resolutions
+            }
+            return Response(data, status=status.HTTP_200_OK)
         else:
             videos = Video.objects.all()
             serializer = VideoSerializer(videos, many=True)
@@ -61,6 +68,15 @@ class VideoView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
+def get_video_resolutions(video):
+    resolutions = {}
+    base_filename = os.path.splitext(os.path.basename(video.video_file.path))[0]
+    for resolution in ['360p', '720p', '1080p']:
+        filename = f'{base_filename}_{resolution}.mp4'
+        filepath = os.path.join(VIDEO_FOLDER, filename)
+        if os.path.exists(filepath):
+            resolutions[resolution] = filepath
+    return resolutions
     
     
 

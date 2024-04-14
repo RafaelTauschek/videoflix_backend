@@ -1,14 +1,16 @@
 import os
 from django.dispatch import receiver
+from django.core.files import File
 import django_rq
-from django.db.models.signals import post_save, post_delete, pre_save
+from django.db.models.signals import post_save, post_delete
 from .models import Video
 from video.tasks import convert_360p, convert_720p, convert_1080p, capture_duration, generate_thumbnail
 
-def convert_and_update_thumbnail(instance, video_path, title):
-    thumbnail_path = generate_thumbnail(video_path, title)
-    instance.thumbnail = thumbnail_path
-    instance.save()
+def convert_and_update_thumbnail(instance, video_path):
+    thumbnail_path = generate_thumbnail(video_path)
+    with open(thumbnail_path, 'rb') as thumbnail_file:
+        thumbnail_file_object = File(thumbnail_file)
+        instance.thumbnail.save(thumbnail_file.name, thumbnail_file_object, save=True)
 
 def convert_and_update_duration(instance, video_path):
     duration = capture_duration(video_path)
@@ -23,12 +25,12 @@ def video_post_save(sender, instance, created, **kwargs):
         print('New video created')
         try:
             queue = django_rq.get_queue('default', autocommit=True)
-            
-            queue.enqueue(convert_and_update_thumbnail, instance, instance.video_file.path, instance.title)
             queue.enqueue(convert_360p, instance.video_file.path)
             queue.enqueue(convert_720p, instance.video_file.path)
             queue.enqueue(convert_1080p, instance.video_file.path)
             queue.enqueue(convert_and_update_duration, instance, instance.video_file.path)
+            queue.enqueue(convert_and_update_thumbnail, instance, instance.video_file.path)
+
             
         except Exception as e:
             print(f'Error enqueueing convert: {e}')
