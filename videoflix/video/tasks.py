@@ -41,6 +41,7 @@ def generate_thumbnail(source):
     except subprocess.CalledProcessError as e:
         print(f"Error generating thumbnail: {e}")
 
+
 def capture_duration(source):
     try:
         cmd = 'ffprobe -i "{}" -show_entries format=duration -v quiet -of csv="p=0"'.format(source)
