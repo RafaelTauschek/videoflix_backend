@@ -30,8 +30,6 @@ def video_post_save(sender, instance, created, **kwargs):
             queue.enqueue(convert_720p, instance.video_file.path)
             queue.enqueue(convert_1080p, instance.video_file.path)
             queue.enqueue(convert_and_update_duration, instance, instance.video_file.path)
-
-            
         except Exception as e:
             print(f'Error enqueueing convert: {e}')
     
