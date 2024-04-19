@@ -6,6 +6,7 @@ from rest_framework.authentication import TokenAuthentication
 from .serializers import CustomUserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
+from django.http import HttpResponseRedirect
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
@@ -26,7 +27,7 @@ class ConfirmEmailView(APIView):
         if user is not None and default_token_generator.check_token(user, token):
             user.valid = True
             user.save()
-            return Response({"message": "Validierung war positiv"})
+            return HttpResponseRedirect("http://localhost:5173/")
         else:
             return Response({"message": "Ungültiger Bestätigungslink oder abgelaufen."}, status=400)
 
