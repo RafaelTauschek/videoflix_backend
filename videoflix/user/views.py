@@ -49,13 +49,15 @@ class LoginUserView(APIView):
         email = request.data.get('email')
         password = request.data.get('password')
         user = authenticate(request, username=email, password=password)
-        if user is not None:
+        if user is None:
+            return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        elif not user.valid:
+            return Response({'error': 'Not Validated'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
             token, created = Token.objects.get_or_create(user=user)
             user.status = True
-            user.save() 
-            return Response({'token': token.key})
-        else:
-            return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)         
+            user.save()
+            return Response({'token': token.key})  
 
 class EditUserView(APIView):
     authentication_classes = [TokenAuthentication]
