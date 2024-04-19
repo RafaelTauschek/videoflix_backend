@@ -28,7 +28,20 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "POST",
+    "PATCH",
+    "PUT"
+)
+
+CORS_ALLOW_HEADERS = (
+    "authorization",
+    "content-type",
+)
 
 # Application definition
 

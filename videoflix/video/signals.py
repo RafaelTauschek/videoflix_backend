@@ -10,7 +10,7 @@ from video.tasks import convert_360p, convert_720p, convert_1080p, capture_durat
 def convert_and_update_thumbnail(instance, video_path):
     thumbnail_path = generate_thumbnail(video_path)
     with open(thumbnail_path, 'rb') as thumbnail_file:
-        instance.thumbnail.save(os.path.basename(thumbnail_path), File(thumbnail_file), save=True)
+        instance.thumbnail = File(thumbnail_file)
 
 
 def convert_and_update_duration(instance, video_path):

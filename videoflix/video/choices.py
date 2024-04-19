@@ -25,6 +25,6 @@ FSK_CHOICES = [
 ]
 
 CATEGORY_CHOICES = [
-    ('Film', 'Film'),
+    ('Movie', 'Movie'),
     ('Show', 'Show')
 ]
