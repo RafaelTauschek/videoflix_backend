@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=-(ag0%9_(4e(ucf1k7wsfw%^0-343w#7+$oiksompb$v*juyj'
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -187,9 +188,9 @@ CORS_ALLOWED_ORIGINS = [
 # EMAIL_USE_TLS = True
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'pleas.noreply.videoflix@gmail.com'
-EMAIL_HOST_PASSWORD = 'zehnxnotlapfomga'
+EMAIL_HOST = config('SMTP_HOST')
+EMAIL_HOST_USER = config('E_HOST_USER')
+EMAIL_HOST_PASSWORD = config('E_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
