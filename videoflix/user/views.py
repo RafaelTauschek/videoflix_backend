@@ -118,6 +118,25 @@ class PasswordResetRequestView(APIView):
                 return Response({"error": "Kein Benutzer mit dieser E-Mail gefunden."}, status=404)
         else:
             return Response({"error": "E-Mail-Adresse ist erforderlich."}, status=400)
+        
+        
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = get_user_model().objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist):
+            return Response({"error": "Ungültiger Benutzer."}, status=status.HTTP_404_NOT_FOUND)
+
+        if user is not None and default_token_generator.check_token(user, token):
+            new_password = request.data.get('password')
+            user.set_password(new_password)
+            user.save()
+            return Response({"message": "Ihr Passwort wurde erfolgreich zurückgesetzt."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Der Passwort-Reset-Link ist ungültig oder abgelaufen."}, status=status.HTTP_400_BAD_REQUEST)
     
     
 class LogoutView(APIView):
