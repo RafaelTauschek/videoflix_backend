@@ -11,6 +11,7 @@ def convert_and_update_thumbnail(instance, video_path):
     thumbnail_path = generate_thumbnail(video_path)
     with open(thumbnail_path, 'rb') as thumbnail_file:
         instance.thumbnail = File(thumbnail_file)
+        instance.save()
 
 
 def convert_and_update_duration(instance, video_path):
