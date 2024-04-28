@@ -7,11 +7,11 @@ from .models import Video
 from video.tasks import convert_360p, convert_720p, convert_1080p, capture_duration, generate_thumbnail
 
 
-def convert_and_update_thumbnail(instance, video_path):
-    thumbnail_path = generate_thumbnail(video_path)
-    with open(thumbnail_path, 'rb') as thumbnail_file:
-        instance.thumbnail = File(thumbnail_file)
-        instance.save()
+# def convert_and_update_thumbnail(instance, video_path):
+#     thumbnail_path = generate_thumbnail(video_path)
+#     with open(thumbnail_path, 'rb') as thumbnail_file:
+#         instance.thumbnail = File(thumbnail_file)
+#         instance.save()
 
 
 def convert_and_update_duration(instance, video_path):
@@ -26,7 +26,7 @@ def video_post_save(sender, instance, created, **kwargs):
         print('New video created')
         try:
             queue = django_rq.get_queue('default', autocommit=True)
-            queue.enqueue(convert_and_update_thumbnail, instance, instance.video_file.path)
+            # queue.enqueue(convert_and_update_thumbnail, instance, instance.video_file.path)
             queue.enqueue(convert_360p, instance.video_file.path)
             queue.enqueue(convert_720p, instance.video_file.path)
             queue.enqueue(convert_1080p, instance.video_file.path)
