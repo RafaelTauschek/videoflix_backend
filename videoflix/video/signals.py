@@ -4,7 +4,7 @@ from django.core.files import File
 import django_rq
 from django.db.models.signals import post_save, post_delete
 from .models import Video
-from video.tasks import convert_360p, convert_720p, convert_1080p, capture_duration, generate_thumbnail
+from video.tasks import convert_360p, convert_720p, convert_1080p, capture_duration
 
 
 # def convert_and_update_thumbnail(instance, video_path):
