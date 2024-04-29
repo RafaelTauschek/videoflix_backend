@@ -39,6 +39,3 @@ def send_password_reset_email(user, request):
     f'Bitte verwende den folgenden Link, um dein Passwort zurückzusetzen: {password_reset_link}\n\n'
     'Vielen Dank!')
     send_mail(subject, message, 'from@example.com', [user.email])
-    
-    
-    

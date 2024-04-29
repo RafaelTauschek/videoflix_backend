@@ -25,6 +25,7 @@ class CustomUser(AbstractBaseUser):
     username = models.CharField(max_length=150)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
+    profile_img = models.CharField(max_length=150, blank=True, default='./src/assets/profile/cat_profilepicture.jpg')
     valid = models.BooleanField(default=False) 
     status = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)

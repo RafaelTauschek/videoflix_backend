@@ -13,7 +13,6 @@ from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth import get_user_model
 from .emails import send_confirmation_email, send_password_reset_email
 from django.contrib.auth import authenticate
-from django.contrib.auth import update_session_auth_hash
 
 
 class ConfirmEmailView(APIView):
@@ -58,6 +57,23 @@ class LoginUserView(APIView):
             user.status = True
             user.save()
             return Response({'token': token.key})  
+        
+
+class GetUserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        serializer = CustomUserSerializer(user)
+        data = {
+            'email': serializer.data.get('email'),
+            'first_name': serializer.data.get('first_name'),
+            'last_name': serializer.data.get('last_name'),
+            'profile_img': serializer.data.get('profile_img')
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
 
 class EditUserView(APIView):
     authentication_classes = [TokenAuthentication]

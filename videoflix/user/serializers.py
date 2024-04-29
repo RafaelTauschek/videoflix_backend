@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('email', 'first_name', 'last_name', 'password')
+        fields = ('email', 'first_name', 'last_name', 'password', 'profile_img')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -13,7 +13,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
-    
     
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)

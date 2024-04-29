@@ -9,6 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .serializers import VideoSerializer
 from .models import Video
+import logging
+
+logger = logging.getLogger(__name__)
 
 VIDEO_FOLDER = './media/videos'
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
@@ -35,6 +38,7 @@ class VideoView(APIView):
     
     @cache_page(CACHE_TTL)
     def post(self, request, format=None):
+        logger.debug("POST request data: %s", request.data)
         serializer = VideoSerializer(data=request.data, context={'request': request})
         if serializer.is_valid(raise_exception=True):
             serializer.save()
